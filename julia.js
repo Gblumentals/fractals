@@ -1,20 +1,39 @@
 function main() {
     var cJulia = document.getElementById('canvasJulia');
+    var cPad = document.getElementById('canvasPad');
+    cPad.c = new complex(-0.8, 0.156);
+    cPad.R = 0.45 * cPad.width;
     cJulia.nbTerms = 150;
     cJulia.W0 = 4;
     cJulia.W = cJulia.W0;
-    cJulia.H0 =  cJulia.height / cJulia.width * cJulia.W;
+    cJulia.H0 = cJulia.height / cJulia.width * cJulia.W;
     cJulia.coeffZoom = 0.5;
     cJulia.zc = new complex(0, 0); // complex numbe the center of the canvas
     cJulia.tabColor = [];
-    var c = new complex(0.3, 0.5);
     for (var i = 0; i < cJulia.nbTerms; i++) {
         cJulia.tabColor.push([i * 255 / (cJulia.nbTerms - 1), i * 255 / (cJulia.nbTerms - 1), i * 215 / (cJulia.nbTerms - 1) + 40, 255]);
     };
 
     cJulia.H = cJulia.H0;
 
+    cPad.draw = function() {
+        var ctx = this.getContext('2d');
 
+        //design circle
+        ctx.fillStyle = 'rgb(255,255,255)';
+        ctx.beginPath();
+        ctx.arc(this.width / 2, this.height / 2, this.R, 0, 2 * Math.PI);
+        ctx.fill();
+
+        //design axes
+        ctx.beginPath(); // verticle axis
+        ctx.moveTo(this.width / 2, 0);
+        ctx.lineTo(this.width / 2, this.height);
+        ctx.moveTo(0, this.height / 2);
+        ctx.lineTo(this.width, this.height / 2);
+        ctx.stroke();
+
+    }
     cJulia.draw = function(c) {
         var context = cJulia.getContext('2d');
         var imageData = context.createImageData(this.width, this.height);
@@ -63,19 +82,20 @@ function main() {
         this.W = this.W * this.coeffZoom;
         this.H = this.H * this.coeffZoom;
 
-        this.draw(c);
+        this.draw(cPad.c);
     }
 
     cJulia.ondblclick = function(ev) {
-        this.zc = new complex(0,0);
+        this.zc = new complex(0, 0);
         this.W = this.W0;
         this.H = this.H0;
-        this.draw(c);
+        this.draw(cPad.c);
     }
 
     cJulia.canvasToComplex = function(li, col) { //li line of pixel, collum of pixel
         return new complex(this.W / this.width * col + this.zc.real - this.W / 2, -this.H / this.height * li + this.zc.imag + this.H / 2);
     }
 
-    cJulia.draw(c);
+    cJulia.draw(cPad.c);
+    cPad.draw();
 }
